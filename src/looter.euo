@@ -1,0 +1,173 @@
+;
+; SOS Chest Looter for UO
+; (C) 2018 Martin Østergaard.
+; Released under MIT License.
+;
+; Place chests in Cargo hold.
+; Setup different kinds of loot using the GUI.
+; Press Play, and have fun.
+;
+
+set %gembag N/A
+set %scrollbag N/A
+set %reagentbag N/A
+set %cargo N/A
+set %soschest N/A
+
+set %gems OVF_UVF_VUF_FVF_EVF_HVF_RVF_BVF_GVF  ;tormaline,diamond,star sapphire,sapphire,amnetyst,ruby,amber,citrine,emerals
+
+set %scrolls VTL_XUL_WYM_IUL_CUL_YUL_WTL_YTL_LUL_DUL_PTL_SUL_PUL_RUL_JUL_BUL_SYM_GUL_EUL_XTL_FUL_PYM_NUL_QTL_NTL_AVL_UUL_CZM_KYM_KUL_HUL_ZUL_ZTL_OUL_QUL_AUL_MUL_TYM
+set %misc LTH_POF_DWL_SADB_QADB_MTH_WOH_PADB_UDF_XVH_VKH_ATK ; refinement, gold,
+
+set %reagents YZF_JZF_TZF_KZF_DUF_KUF_MZF_JUF_SZF_RZF_WZF_UZF_IUF
+
+;clear menu
+menu clear
+;make it appear
+menu show
+;size it
+menu window size 200 200
+;draw buttons
+; menu button id X,Y, width ,height, Caption/Text
+
+menu window Title sos , #spc , looter
+menu button button1 20 0 85 20 cargo , #spc , hold
+
+menu button button2 20 20 85 20 scroll , #spc , bag
+menu check Lootscrolls 110 25 60 10 #true
+menu button button3 20 40 85 20 sos , #spc , chest
+
+menu button button4 20 60 85 20 gem , #spc , bag
+menu check lootgem 110 65 60 10 #true
+
+menu button button5 20 100 85 20 GO
+
+menu button button6 20 80 85 20 Reagent , #spc , bag
+menu check lootreagents 110 85 60 10 #true
+
+set #menubutton n/a
+loop:
+if #menubutton = button1 ; target hold
+{
+ set #menubutton n/a
+ event sysmessage Target cargo hold
+ set #targcurs 1
+ while #targcurs = 1
+ {
+  wait 5
+ }
+ set  %cargo #ltargetid
+ wait 10
+}
+
+if #menubutton = button2 ; target scroll bag
+{
+ event sysmessage Target scroll bag
+ set #targcurs 1
+ while #targcurs = 1
+      {
+       wait 5
+      }
+ set  %scrollbag #ltargetid
+ wait 10
+ set #menubutton n/a
+}
+
+if #menubutton = button3 ; target sos bag
+{
+ event sysmessage Target sos chest
+ set #targcurs 1
+ while #targcurs = 1
+      {
+       wait 5
+      }
+ set  %soschest #ltargetid
+ wait 10
+
+ ; open sos box
+ set #lobjectid %soschest
+ event macro 17 0
+ wait 10
+ set #menubutton n/a
+}
+
+if #menubutton = button4 ; target gem bag
+{
+ event sysmessage Target gem bag
+ set #targcurs 1
+ while #targcurs = 1
+      {
+       wait 5
+      }
+ set  %gembag #ltargetid
+ wait 10
+ set #menubutton n/a
+}
+
+if #menubutton = button6 ; target reagent bag :P
+{
+ event sysmessage Target reagent bag
+ set #targcurs 1
+ while #targcurs = 1
+      {
+       wait 5
+      }
+ set  %reagentbag #ltargetid
+ wait 10
+ set #menubutton n/a
+}
+
+if #menubutton = button5 ; GO
+{
+gemmove:
+ finditem %gems C_ , %soschest
+ if #findcnt > 0
+ {
+   exevent Drag #findid #findstack
+   wait 10
+   exevent Dropc %gembag
+   wait 10
+   goto gemmove
+ }
+
+ event sysmessage Gems moved.
+
+scrollmove:
+ finditem %scrolls C_ , %soschest
+ if #findcnt > 0
+ {
+   exevent Drag #findid #findstack
+   wait 10
+   exevent Dropc %scrollbag
+   wait 10
+   goto scrollmove
+ }
+ event sysmessage Scrolls moved.
+
+cargomove:
+ finditem %misc C_ , %soschest
+ if #findcnt > 0
+ {
+   exevent Drag #findid #findstack
+   wait 10
+   exevent Dropc %cargo
+   wait 10
+   goto cargomove
+ }
+ event sysmessage misc moved to cargo hold
+
+reagentmove:
+ finditem %reagents C_ , %soschest
+ if #findcnt > 0
+ {
+   exevent Drag #findid #findstack
+   wait 10
+   exevent Dropc %reagentbag
+   wait 10
+   goto reagentmove
+ }
+ event sysmessage reagents moved to cargo hold
+ set #menubutton n/a
+}
+goto loop
+

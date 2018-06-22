@@ -1,2 +1,1 @@
-# SOS-Sorter
-Script to sort SOS chests in UO
+Very simple GUI based script to sort chests in UO, using easyuo.
